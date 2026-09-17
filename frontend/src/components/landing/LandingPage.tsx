@@ -9,12 +9,13 @@ import {
   Play, 
   DollarSign, 
   Layers, 
-  ChevronRight, 
   AlertTriangle,
   TrendingUp,
   HeartHandshake
 } from 'lucide-react';
+import { MountainParallax } from './MountainParallax';
 import { REGIONAL_ACCENTS } from '../../data/presets';
+import { smoothScroll } from '../../services/smoothScroll';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -23,21 +24,18 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const scrollToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    smoothScroll.scrollTo(`#${sectionId}`, { offset: -70, duration: 1.4 });
   };
 
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col font-body selection:bg-blue-500/20 selection:text-blue-900">
       
       {/* 1. Top Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           
           {/* Brand */}
-          <div className="flex items-center gap-3.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="flex items-center gap-3.5 cursor-pointer" onClick={() => smoothScroll.scrollTo(0, { duration: 1.2 })}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white flex items-center justify-center shadow-md shadow-blue-600/15 font-bold">
               <Shield className="w-5 h-5 text-white" />
             </div>
@@ -56,16 +54,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 font-body">
-            <button onClick={() => scrollToSection('features')} className="hover:text-blue-600 transition-colors">
+            <button onClick={() => scrollToSection('features')} className="hover:text-blue-600 transition-colors cursor-pointer">
               Features
             </button>
-            <button onClick={() => scrollToSection('pipeline')} className="hover:text-blue-600 transition-colors">
+            <button onClick={() => scrollToSection('pipeline')} className="hover:text-blue-600 transition-colors cursor-pointer">
               Architecture
             </button>
-            <button onClick={() => scrollToSection('accents')} className="hover:text-blue-600 transition-colors">
+            <button onClick={() => scrollToSection('accents')} className="hover:text-blue-600 transition-colors cursor-pointer">
               Indian Languages
             </button>
-            <button onClick={() => scrollToSection('compliance')} className="hover:text-blue-600 transition-colors">
+            <button onClick={() => scrollToSection('compliance')} className="hover:text-blue-600 transition-colors cursor-pointer">
               DPDP Compliance
             </button>
           </nav>
@@ -74,14 +72,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => scrollToSection('features')}
-              className="hidden sm:inline-flex px-4 py-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors font-body"
+              className="hidden sm:inline-flex px-4 py-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors font-body cursor-pointer"
             >
               Explore More
             </button>
 
             <button
               onClick={onStart}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 flex items-center gap-2 transition-all transform active:scale-95 font-body"
+              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 flex items-center gap-2 transition-all transform active:scale-95 font-body cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-blue-200" />
               <span>Let's Start</span>
@@ -92,151 +90,142 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </header>
 
-      {/* 2. Hero Section */}
-      <section className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-slate-50/90 via-white to-white border-b border-slate-100">
-        
-        {/* Subtle background blur */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-blue-400/10 via-indigo-300/10 to-teal-300/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      {/* 2. Mountain Parallax Hero Experience */}
+      <MountainParallax 
+        onStart={onStart}
+        onExplore={() => scrollToSection('live-preview')}
+      />
 
+      {/* 3. Live KPI Stats & Interactive Interception Mockup Section (id="live-preview") */}
+      <section id="live-preview" className="py-16 bg-white border-b border-slate-100 relative z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-            
-            {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold shadow-xs font-body">
-                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                <span>Edge-First AI Voice Defense</span>
-                <span className="text-slate-400">•</span>
-                <span className="text-blue-900 font-bold">DPDP Act 2023 Sec 6</span>
-              </div>
-
-              {/* Bold Headline in Inter */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-heading text-slate-900 leading-[1.12]">
-                Real-Time AI Voice Deepfake & <span className="gradient-text">Fraud Interception</span>
-              </h1>
-
-              {/* Body Text in Space Grotesk */}
-              <p className="text-base sm:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed mx-auto lg:mx-0 font-body">
-                <strong>VaniRakshak</strong> defends citizens, banks, and enterprise networks against AI voice cloning extortion, CEO impersonation, and fraudulent wire transfers in real time. Powered by client-side Web Audio API DSP and INT8 quantized ONNX models.
-              </p>
-
-              {/* Primary & Secondary CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                <button
-                  onClick={onStart}
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-blue-600/25 hover:shadow-blue-600/35 flex items-center justify-center gap-2.5 transition-all transform hover:-translate-y-0.5 active:scale-95 font-body"
-                >
-                  <Sparkles className="w-5 h-5 text-blue-200" />
-                  <span>Let's Start Live Detection</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-
-                <button
-                  onClick={() => scrollToSection('features')}
-                  className="w-full sm:w-auto px-7 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm sm:text-base border border-slate-300 shadow-sm transition-all flex items-center justify-center gap-2 font-body"
-                >
-                  <span>Explore Architecture</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </button>
-              </div>
-
-              {/* 4 Quick Stat Pills with Space Grotesk Numbers */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-200/80 font-body">
-                <div className="p-3 rounded-2xl bg-white border border-slate-200/90 text-left shadow-xs">
-                  <div className="text-2xl font-extrabold font-body text-emerald-600">₹0.00</div>
-                  <div className="text-[11px] text-slate-500 font-medium">Cloud Compute Cost</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-white border border-slate-200/90 text-left shadow-xs">
-                  <div className="text-2xl font-extrabold font-body text-blue-600">&lt; 50 ms</div>
-                  <div className="text-[11px] text-slate-500 font-medium">Detection Latency</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-white border border-slate-200/90 text-left shadow-xs">
-                  <div className="text-2xl font-extrabold font-body text-indigo-600">99.4%</div>
-                  <div className="text-[11px] text-slate-500 font-medium">Accent Invariance</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-white border border-slate-200/90 text-left shadow-xs">
-                  <div className="text-2xl font-extrabold font-body text-slate-900">100%</div>
-                  <div className="text-[11px] text-slate-500 font-medium">DPDP Compliant</div>
-                </div>
-              </div>
-
+          
+          {/* 4 Quick Stat Pills with Space Grotesk Numbers */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-14 font-body">
+            <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 text-left shadow-xs light-card-hover">
+              <div className="text-3xl font-extrabold font-body text-emerald-600">₹0.00</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Cloud Compute Cost / Call</div>
+              <div className="text-[10px] text-slate-400 font-mono mt-0.5">100% Client-Side ONNX</div>
             </div>
+            <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 text-left shadow-xs light-card-hover">
+              <div className="text-3xl font-extrabold font-body text-blue-600">&lt; 50 ms</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Edge Inference Latency</div>
+              <div className="text-[10px] text-slate-400 font-mono mt-0.5">4s Buffer / 50% Overlap</div>
+            </div>
+            <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 text-left shadow-xs light-card-hover">
+              <div className="text-3xl font-extrabold font-body text-indigo-600">99.4%</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Accent Invariance</div>
+              <div className="text-[10px] text-slate-400 font-mono mt-0.5">AI4Bharat Kathbath Trained</div>
+            </div>
+            <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 text-left shadow-xs light-card-hover">
+              <div className="text-3xl font-extrabold font-body text-slate-900">100%</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">DPDP Act Compliant</div>
+              <div className="text-[10px] text-slate-400 font-mono mt-0.5">Section 6 Ephemeral RAM</div>
+            </div>
+          </div>
 
-            {/* Right Interactive Mockup Card */}
-            <div className="lg:col-span-5 font-body">
-              <div className="relative rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 light-card-hover">
-                
-                {/* Header of Preview Card */}
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-                    <span className="text-xs font-bold font-mono text-slate-900 uppercase tracking-wide">
-                      Live Call Interception
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-body px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold">
-                    Risk: 92.4% (CRITICAL)
+          {/* Interactive Live Call Interception Showcase */}
+          <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 text-white p-6 sm:p-10 shadow-2xl border border-slate-800 relative overflow-hidden">
+            
+            {/* Ambient background blur */}
+            <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              
+              <div className="lg:col-span-6 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-mono font-bold">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                  <span>LIVE THREAT INTERCEPTION</span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-extrabold font-heading text-white">
+                  Senior Citizen Extortion Call Suspended in Real Time
+                </h3>
+
+                <p className="text-slate-300 text-sm leading-relaxed font-body">
+                  Scammer using ElevenLabs neural voice cloning attempted to impersonate a grandson in distress requesting ₹1,80,000 emergency NEFT transfer. VaniRakshak’s on-device acoustic engine detected artificial pitch stability and HiFi-GAN high-frequency cutoffs, suspending the transaction in under 500ms.
+                </p>
+
+                <div className="flex flex-wrap gap-2 pt-2 text-xs font-mono">
+                  <span className="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+                    • PVSI: 0.94 (Synthetic Constancy)
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+                    • Cutoff: 7.8 kHz (Neural Vocoder)
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-500/50 text-rose-300 font-bold">
+                    • Threat: 92.4% CRITICAL
                   </span>
                 </div>
 
-                {/* High Contrast Spectrogram Frame */}
-                <div className="h-36 w-full rounded-2xl bg-[#090d16] p-3.5 relative overflow-hidden flex flex-col justify-between mb-4 shadow-inner border border-slate-900">
+                <div className="pt-2">
+                  <button
+                    onClick={onStart}
+                    className="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg shadow-blue-500/25 cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-current text-slate-950" />
+                    <span>Test This Scenario in Live Console</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Mockup Audio Visualizer Frame */}
+              <div className="lg:col-span-6 bg-slate-900/90 rounded-2xl p-5 border border-slate-800 shadow-inner space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-xs font-mono text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span>16 kHz PCM DSP Stream</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">
+                    TRANSFER QUARANTINED
+                  </span>
+                </div>
+
+                <div className="h-32 w-full rounded-xl bg-[#090d16] p-3 flex flex-col justify-between border border-slate-950">
                   <div className="flex items-center justify-between text-[10px] font-mono text-cyan-400">
-                    <span>16 kHz PCM Live Feed</span>
+                    <span>Harmonic Energy (HNR: 22.4 dB)</span>
                     <span className="text-rose-400 font-bold">Vocoder Cutoff: 7.8 kHz</span>
                   </div>
-                  
-                  {/* Waveform bars */}
-                  <div className="flex items-center justify-between gap-1 h-14">
-                    {Array.from({ length: 32 }).map((_, i) => (
+
+                  <div className="flex items-end justify-between gap-1 h-14">
+                    {Array.from({ length: 28 }).map((_, i) => (
                       <div
                         key={i}
                         className="flex-1 bg-gradient-to-t from-cyan-400 via-blue-500 to-rose-500 rounded-full"
                         style={{
-                          height: `${Math.max(15, (Math.sin(i * 0.4) * 0.5 + 0.5) * 100)}%`,
-                          opacity: i > 20 ? 0.3 : 0.95
+                          height: `${Math.max(20, (Math.sin(i * 0.45) * 0.5 + 0.5) * 100)}%`,
+                          opacity: i > 18 ? 0.35 : 0.95
                         }}
                       />
                     ))}
                   </div>
 
                   <div className="flex justify-between text-[9px] font-mono text-slate-400">
-                    <span>0 Hz (Fundamental)</span>
-                    <span className="text-rose-400 font-semibold">⚠️ HiFi-GAN Vocoder Truncation</span>
+                    <span>0 Hz</span>
+                    <span className="text-rose-400">⚠️ ElevenLabs Neural Vocoder Truncation</span>
                     <span>8 kHz</span>
                   </div>
                 </div>
 
-                {/* Fraud Interception Banner */}
-                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs mb-4 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-rose-800 font-heading">
-                    <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                    <span>Synthetic Voice Impersonation Detected</span>
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                    <span className="text-rose-200 text-[11px] font-semibold">
+                      Out-of-band Step-up SMS OTP challenge dispatched to victim
+                    </span>
                   </div>
-                  <p className="text-[11px] text-rose-950/80 leading-relaxed font-body">
-                    Verbal authorization failed glottal pulse verification. ₹2,50,000 NEFT wire transfer automatically suspended.
-                  </p>
+                  <span className="text-[10px] font-mono font-bold text-rose-300">OTP: 8492</span>
                 </div>
-
-                {/* Direct Launch Button */}
-                <button
-                  onClick={onStart}
-                  className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-md font-body"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current text-cyan-300" />
-                  <span>Launch Live Interception Dashboard</span>
-                </button>
-
               </div>
+
             </div>
 
           </div>
+
         </div>
       </section>
 
-      {/* 3. Key Architecture & Features Breakdown (id="features") */}
+      {/* 4. Key Architecture & Features Breakdown (id="features") */}
       <section id="features" className="py-24 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -337,7 +326,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 4. Architecture Pipeline (id="pipeline") with Space Grotesk Outline Numbers */}
+      {/* 5. Architecture Pipeline (id="pipeline") with Space Grotesk Outline Numbers */}
       <section id="pipeline" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -435,7 +424,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 5. Indian Regional Language Matrix (id="accents") */}
+      {/* 6. Indian Regional Language Matrix (id="accents") */}
       <section id="accents" className="py-24 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -475,7 +464,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 6. Statutory Compliance & Hackathon Pillars (id="compliance") */}
+      {/* 7. Statutory Compliance & Hackathon Pillars (id="compliance") */}
       <section id="compliance" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-body">
           
@@ -539,7 +528,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 7. Bottom Action Banner */}
+      {/* 8. Bottom Action Banner */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white relative overflow-hidden font-body">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading">
@@ -551,7 +540,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="pt-2">
             <button
               onClick={onStart}
-              className="px-9 py-4 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-extrabold text-base shadow-xl flex items-center gap-2.5 mx-auto transition-all transform hover:scale-105 active:scale-95 font-body"
+              className="px-9 py-4 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-extrabold text-base shadow-xl flex items-center gap-2.5 mx-auto transition-all transform hover:scale-105 active:scale-95 font-body cursor-pointer"
             >
               <Sparkles className="w-5 h-5 text-slate-950" />
               <span>Let's Start Live Evaluation</span>
@@ -561,7 +550,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 8. Footer */}
+      {/* 9. Footer */}
       <footer className="bg-white border-t border-slate-200 py-8 px-4 text-center text-xs text-slate-500 font-mono">
         <p>VaniRakshak (वाणी रक्षक) • AI Voice Deepfake Defense & Fraud Interception Platform • DPDP Act 2023 Sec 6 Compliant</p>
       </footer>

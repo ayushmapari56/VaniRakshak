@@ -20,7 +20,9 @@ import { BankingInterventionModal } from './components/mitigation/BankingInterve
 import { JudgeConsole } from './components/judge/JudgeConsole';
 import { ForensicReportModal } from './components/forensics/ForensicReportModal';
 import { audioEngine } from './services/audioEngine';
+import { smoothScroll } from './services/smoothScroll';
 import type { AcousticBreakdown, AudioSamplePreset, ThreatMetrics } from './types';
+
 
 const initialMetrics: ThreatMetrics = {
   timestamp: Date.now(),
@@ -64,6 +66,14 @@ export function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [hasTriggeredCriticalModal, setHasTriggeredCriticalModal] = useState(false);
 
+  // Initialize Lenis Smooth Scroll on mount (Ryze Technologies style physics)
+  useEffect(() => {
+    smoothScroll.init();
+    return () => {
+      smoothScroll.destroy();
+    };
+  }, []);
+
   // Subscribe to Audio Engine Events
   useEffect(() => {
     const unsubscribe = audioEngine.subscribe(
@@ -88,6 +98,7 @@ export function App() {
       audioEngine.stopCurrentAudio();
     };
   }, [hasTriggeredCriticalModal]);
+
 
   // Audio Handlers
   const handleStartLiveMic = async () => {
@@ -150,7 +161,7 @@ export function App() {
       <LandingPage
         onStart={() => {
           setCurrentView('dashboard');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          smoothScroll.scrollTo(0, { immediate: true });
         }}
       />
     );
@@ -158,7 +169,7 @@ export function App() {
 
   // Dashboard View
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-500/20 selection:text-blue-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-body selection:bg-blue-500/20 selection:text-blue-900">
       
       {/* Top Header */}
       <Header
@@ -170,9 +181,10 @@ export function App() {
         onBackToLanding={() => {
           handleStopAudio();
           setCurrentView('landing');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          smoothScroll.scrollTo(0, { immediate: true });
         }}
       />
+
 
       {/* Main Dashboard Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
