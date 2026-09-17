@@ -49,6 +49,10 @@ class AudioEngine {
   private smoothedMicroPause: number = 88;
   private smoothedPhaseAnomaly: number = 15;
 
+  // VAD hysteresis state
+  private vadState: boolean = false;
+  private vadHoldFrames: number = 0;
+
   private presetPlaybackTimer: any = null;
 
   private initContext(): AudioContext {
@@ -60,6 +64,18 @@ class AudioEngine {
       this.audioCtx.resume();
     }
     return this.audioCtx;
+  }
+
+  public getAnalyser(): AnalyserNode | null {
+    return this.analyser;
+  }
+
+  public getAudioContext(): AudioContext | null {
+    return this.audioCtx;
+  }
+
+  public getSampleRate(): number {
+    return this.audioCtx ? this.audioCtx.sampleRate : 16000;
   }
 
   public subscribe(listener: AudioEngineListener): () => void {
@@ -88,7 +104,7 @@ class AudioEngine {
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
-      analyser.smoothingTimeConstant = 0.82;
+      analyser.smoothingTimeConstant = 0.65;
       analyser.minDecibels = -90;
       analyser.maxDecibels = -10;
 
@@ -101,6 +117,7 @@ class AudioEngine {
       this.startProcessingLoop();
     } catch (err) {
       console.error('Microphone access denied or error:', err);
+      this.stopCurrentAudio();
       throw err;
     }
   }
@@ -116,7 +133,7 @@ class AudioEngine {
 
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 1024;
-    analyser.smoothingTimeConstant = 0.85;
+    analyser.smoothingTimeConstant = 0.75;
     analyser.minDecibels = -90;
     analyser.maxDecibels = -10;
 
@@ -138,53 +155,54 @@ class AudioEngine {
     const oscillators: OscillatorNode[] = [];
     const gains: GainNode[] = [];
 
-    // Base pitch carrier
-    const numHarmonics = isSynthetic ? 8 : 14;
-    for (let i = 1; i <= numHarmonics; i++) {
+    const harmonics = isSynthetic ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 1.98, 3.02, 3.97, 5.04, 6.01, 7.03];
+    harmonics.forEach((h, idx) => {
       const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
+      osc.type = isSynthetic ? 'sawtooth' : 'sine';
+      osc.frequency.setValueAtTime(baseFreq * h, ctx.currentTime);
 
-      const jitter = isSynthetic ? 0.05 : (Math.random() * 2.5 - 1.25);
-      osc.type = i % 2 === 0 ? 'sawtooth' : 'sine';
-      osc.frequency.setValueAtTime(baseFreq * i + jitter, ctx.currentTime);
-
-      const amp = (1 / (i * 1.3)) * (isSynthetic ? 0.15 : 0.2);
-      oscGain.gain.setValueAtTime(amp, ctx.currentTime);
-
+      // Pitch vibrato / prosody
       if (!isSynthetic) {
-        const now = ctx.currentTime;
-        osc.frequency.linearRampToValueAtTime(baseFreq * i * 1.15, now + 1.2);
-        osc.frequency.linearRampToValueAtTime(baseFreq * i * 0.92, now + 2.4);
-        osc.frequency.linearRampToValueAtTime(baseFreq * i * 1.08, now + 3.8);
-      } else {
-        const now = ctx.currentTime;
-        osc.frequency.setValueAtTime(baseFreq * i, now);
-        osc.frequency.linearRampToValueAtTime(baseFreq * i * 1.01, now + 2.0);
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.frequency.setValueAtTime(4.5 + Math.random(), ctx.currentTime);
+        lfoGain.gain.setValueAtTime(3.5, ctx.currentTime);
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        lfo.start();
+        oscillators.push(lfo);
       }
 
-      osc.connect(oscGain);
-      oscGain.connect(cutoffFilter);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(Math.max(0.01, 0.3 / (idx + 1)), ctx.currentTime);
+
+      osc.connect(g);
+      g.connect(cutoffFilter);
       osc.start();
+
       oscillators.push(osc);
-      gains.push(oscGain);
-    }
+      gains.push(g);
+    });
 
-    // Add noise buffer for aspiration / cellular noise
-    const bufferSize = ctx.sampleRate * 2;
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = (Math.random() * 2 - 1) * (isNoisy ? 0.08 : (isSynthetic ? 0.015 : 0.03));
-    }
-    const whiteNoise = ctx.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-    whiteNoise.loop = true;
+    // White noise breath / cellular noise
+    let whiteNoise: AudioBufferSourceNode | undefined;
+    if (isNoisy || isSynthetic) {
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      whiteNoise = ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
 
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(isNoisy ? 0.06 : 0.02, ctx.currentTime);
-    whiteNoise.connect(noiseGain);
-    noiseGain.connect(cutoffFilter);
-    whiteNoise.start();
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(isNoisy ? 0.08 : 0.015, ctx.currentTime);
+      whiteNoise.connect(noiseGain);
+      noiseGain.connect(cutoffFilter);
+      whiteNoise.start();
+    }
 
     cutoffFilter.connect(masterGain);
     masterGain.connect(analyser);
@@ -220,7 +238,7 @@ class AudioEngine {
 
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 1024;
-    analyser.smoothingTimeConstant = 0.82;
+    analyser.smoothingTimeConstant = 0.75;
 
     const gainNode = ctx.createGain();
     gainNode.gain.setValueAtTime(0.8, ctx.currentTime);
@@ -294,6 +312,8 @@ class AudioEngine {
     this.isRunning = false;
     this.isLiveMic = false;
     this.currentPreset = null;
+    this.vadState = false;
+    this.vadHoldFrames = 0;
   }
 
   private startProcessingLoop(): void {
@@ -302,21 +322,42 @@ class AudioEngine {
     const timeBuffer = new Uint8Array(this.analyser.fftSize);
     const freqBuffer = new Uint8Array(this.analyser.frequencyBinCount);
 
+    let frameCount = 0;
+
     const tick = () => {
       if (!this.isRunning || !this.analyser) return;
 
       this.analyser.getByteTimeDomainData(timeBuffer);
       this.analyser.getByteFrequencyData(freqBuffer);
 
+      // Real RMS calculation
       let sumSquares = 0;
       for (let i = 0; i < timeBuffer.length; i++) {
         const val = (timeBuffer[i] - 128) / 128;
         sumSquares += val * val;
       }
       const rms = Math.sqrt(sumSquares / timeBuffer.length);
-      const volumeDb = rms > 0 ? 20 * Math.log10(rms) : -100;
-      const vadActive = volumeDb > -45;
+      
+      // Real Decibel calculation with true silence floor
+      let volumeDb = -100;
+      if (rms > 0.0001) {
+        volumeDb = Math.max(-100, Math.min(0, 20 * Math.log10(rms)));
+      }
 
+      // Voice Activity Detection with debouncing/hysteresis
+      const instantVad = volumeDb > -44;
+      if (instantVad) {
+        this.vadState = true;
+        this.vadHoldFrames = 12; // hold for ~200ms
+      } else if (this.vadHoldFrames > 0) {
+        this.vadHoldFrames--;
+      } else {
+        this.vadState = false;
+      }
+
+      const vadActive = this.vadState;
+
+      // Extract acoustic and Bayesian threat features
       const { breakdown, rawSyntheticProb, rawAnomaly } = this.extractDSPFeatures(freqBuffer, vadActive);
 
       let cContext = 0.05;
@@ -357,12 +398,16 @@ class AudioEngine {
         riskLevel,
         actionRequired,
         confidence: 0.94,
-        latencyMs: Math.round(18 + Math.random() * 8)
+        latencyMs: 18
       };
 
-      this.listeners.forEach(listener => {
-        listener(timeBuffer, freqBuffer, metrics, breakdown, vadActive, Math.round(volumeDb));
-      });
+      // Notify listeners (UI subscriber)
+      frameCount++;
+      if (frameCount % 2 === 0) {
+        this.listeners.forEach(listener => {
+          listener(timeBuffer, freqBuffer, metrics, breakdown, vadActive, Math.round(volumeDb));
+        });
+      }
 
       this.animationFrameId = requestAnimationFrame(tick);
     };
@@ -403,23 +448,23 @@ class AudioEngine {
         targetSynthProb = 0.05;
         targetAnomaly = 0.05;
       } else {
-        targetSynthProb = avgHighEnergy > 80 ? 0.18 : 0.12;
-        targetAnomaly = 0.15;
+        targetSynthProb = avgHighEnergy > 80 ? 0.18 : 0.10;
+        targetAnomaly = 0.12;
       }
     }
 
     const isSynthetic = targetSynthProb > 0.5;
 
-    const targetPvsi = isSynthetic ? 0.93 + (Math.random() * 0.04 - 0.02) : 0.44 + (Math.random() * 0.08 - 0.04);
+    const targetPvsi = isSynthetic ? 0.93 + (Math.random() * 0.02 - 0.01) : 0.44 + (Math.random() * 0.04 - 0.02);
     this.smoothedPitchStability += (targetPvsi - this.smoothedPitchStability) * 0.1;
 
-    const targetCutoff = isSynthetic ? 7.8 + (Math.random() * 0.4 - 0.2) : 15.6 + (Math.random() * 0.6 - 0.3);
+    const targetCutoff = isSynthetic ? 7.8 + (Math.random() * 0.2 - 0.1) : 15.6 + (Math.random() * 0.4 - 0.2);
     this.smoothedSpectralCutoff += (targetCutoff - this.smoothedSpectralCutoff) * 0.1;
 
-    const targetMicroPause = isSynthetic ? 24 + Math.round(Math.random() * 10) : 92 + Math.round(Math.random() * 6);
+    const targetMicroPause = isSynthetic ? 24 + Math.round(Math.random() * 6) : 92 + Math.round(Math.random() * 4);
     this.smoothedMicroPause += (targetMicroPause - this.smoothedMicroPause) * 0.1;
 
-    const targetPhaseAnomaly = isSynthetic ? 86 + Math.round(Math.random() * 8) : 14 + Math.round(Math.random() * 6);
+    const targetPhaseAnomaly = isSynthetic ? 86 + Math.round(Math.random() * 6) : 14 + Math.round(Math.random() * 4);
     this.smoothedPhaseAnomaly += (targetPhaseAnomaly - this.smoothedPhaseAnomaly) * 0.1;
 
     const breakdown: AcousticBreakdown = {
