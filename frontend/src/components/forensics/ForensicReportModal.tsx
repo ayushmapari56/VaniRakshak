@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, ShieldAlert, Download, X, FileText, Lock } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Download, X, Lock } from 'lucide-react';
 import type { AcousticBreakdown, ThreatMetrics } from '../../types';
 
 interface ForensicReportModalProps {
@@ -66,11 +66,11 @@ export const ForensicReportModal: React.FC<ForensicReportModalProps> = ({
         {/* Header */}
         <div className="bg-slate-50 px-6 py-4 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
-              <FileText className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm p-1 flex items-center justify-center shrink-0">
+              <img src="/logo.png" alt="VaniRakshak Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 font-display">
+              <h3 className="text-base font-extrabold text-slate-900 font-display flex items-center gap-2">
                 VaniRakshak Forensic Audit Certificate
               </h3>
               <p className="text-xs text-slate-500 font-mono">

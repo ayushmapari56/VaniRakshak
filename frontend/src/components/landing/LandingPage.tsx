@@ -36,9 +36,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           
           {/* Brand */}
           <div className="flex items-center gap-3.5 cursor-pointer" onClick={() => smoothScroll.scrollTo(0, { duration: 1.2 })}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white flex items-center justify-center shadow-md shadow-blue-600/15 font-bold">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-md flex items-center justify-center p-0.5">
+              <img src="/logo.png" alt="VaniRakshak Logo" className="w-full h-full object-contain" />
             </div>
+
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-extrabold font-heading tracking-tight text-slate-900">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ShieldAlert, 
   AlertTriangle, 
   PhoneOff, 
   CheckCircle2, 
@@ -112,8 +111,8 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
         {/* Header Ribbon */}
         <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-700 px-6 py-4 flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white">
-              <ShieldAlert className="w-6 h-6 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-white p-1 border border-white/30 flex items-center justify-center shrink-0 shadow-sm">
+              <img src="/logo.png" alt="VaniRakshak Guardian Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h3 className="text-base font-extrabold font-display tracking-wide uppercase flex items-center gap-2">

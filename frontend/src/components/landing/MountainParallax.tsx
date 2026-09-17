@@ -158,6 +158,11 @@ export const MountainParallax: React.FC<MountainParallaxProps> = ({ onStart, onE
           opacity: Math.max(0, 1 - scrollY / 550)
         }}
       >
+        {/* Logo Guardian Avatar */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl overflow-hidden bg-white/95 p-1.5 shadow-2xl border border-white backdrop-blur-md animate-soft-pulse">
+          <img src="/logo.png" alt="VaniRakshak Guardian Logo" className="w-full h-full object-contain" />
+        </div>
+
         {/* Top Floating Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-slate-300 text-slate-800 text-xs font-semibold shadow-md font-body">
           <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
@@ -165,6 +170,7 @@ export const MountainParallax: React.FC<MountainParallaxProps> = ({ onStart, onE
           <span className="text-slate-400">•</span>
           <span className="text-blue-700 font-bold">DPDP 2023</span>
         </div>
+
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-heading text-slate-900 leading-[1.08] drop-shadow-xs">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Cpu, Lock, Volume2, Mic, Sparkles, ArrowLeft } from 'lucide-react';
+import { Cpu, Lock, Volume2, Mic, Sparkles, ArrowLeft } from 'lucide-react';
 import type { RiskLevel } from '../../types';
 
 interface HeaderProps {
@@ -38,14 +38,14 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm transition-all ${
+              <div className={`w-11 h-11 rounded-2xl overflow-hidden flex items-center justify-center shadow-md border transition-all p-0.5 bg-white ${
                 riskLevel === 'CRITICAL'
-                  ? 'bg-rose-50 text-rose-600 border border-rose-300'
+                  ? 'border-rose-400 ring-2 ring-rose-500/20'
                   : riskLevel === 'SUSPICIOUS'
-                  ? 'bg-amber-50 text-amber-600 border border-amber-300'
-                  : 'bg-emerald-50 text-emerald-600 border border-emerald-300'
+                  ? 'border-amber-400 ring-2 ring-amber-500/20'
+                  : 'border-slate-200'
               }`}>
-                <Shield className="w-5 h-5" />
+                <img src="/logo.png" alt="VaniRakshak Logo" className="w-full h-full object-contain" />
               </div>
               {isStreaming && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -58,6 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               )}
             </div>
+
 
             <div>
               <div className="flex items-center gap-2">
