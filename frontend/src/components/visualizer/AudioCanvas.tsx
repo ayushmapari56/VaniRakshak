@@ -52,10 +52,12 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
     const width = rect.width;
     const height = rect.height;
 
-    ctx.fillStyle = '#080d1a';
+    // High contrast dark canvas background inside the clean white frame
+    ctx.fillStyle = '#0a0f1d';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    // Subtle grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     for (let x = 0; x < width; x += 40) {
       ctx.beginPath();
@@ -75,7 +77,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
       drawSpectrogram(ctx, 0, 0, width, midY);
       drawWaveform(ctx, 0, midY, width, height - midY);
 
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+      ctx.strokeStyle = 'rgba(14, 165, 233, 0.3)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(0, midY);
@@ -95,7 +97,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
         const lineY = targetCanvasHeight * (1 - cutoffRatio);
         
         ctx.save();
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.9)';
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 4]);
         ctx.beginPath();
@@ -103,9 +105,9 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
         ctx.lineTo(width, lineY);
         ctx.stroke();
 
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.95)';
         ctx.font = '10px JetBrains Mono, monospace';
-        ctx.fillText(`⚠️ NEURAL VOCODER CUTOFF: ${vocoderCutoffKhz.toFixed(1)} kHz (HiFi-GAN / DiffWave Attenuation)`, 12, lineY - 6);
+        ctx.fillText(`⚠️ NEURAL VOCODER CUTOFF: ${vocoderCutoffKhz.toFixed(1)} kHz (HiFi-GAN / DiffWave)`, 12, lineY - 6);
         ctx.restore();
       }
     }
@@ -115,7 +117,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
   const drawWaveform = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
     const centerY = y + h / 2;
 
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x, centerY);
@@ -123,7 +125,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
     ctx.stroke();
 
     if (!isStreaming || !timeData || timeData.length === 0) {
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.strokeStyle = 'rgba(14, 165, 233, 0.5)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       const time = Date.now() / 300;
@@ -136,8 +138,8 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
       return;
     }
 
-    const waveColor = riskLevel === 'CRITICAL' ? '#f43f5e' : (riskLevel === 'SUSPICIOUS' ? '#fbbf24' : '#06b6d4');
-    const glowColor = riskLevel === 'CRITICAL' ? 'rgba(244, 63, 94, 0.4)' : (riskLevel === 'SUSPICIOUS' ? 'rgba(251, 191, 36, 0.4)' : 'rgba(6, 182, 212, 0.4)');
+    const waveColor = riskLevel === 'CRITICAL' ? '#f43f5e' : (riskLevel === 'SUSPICIOUS' ? '#f59e0b' : '#0284c7');
+    const glowColor = riskLevel === 'CRITICAL' ? 'rgba(244, 63, 94, 0.4)' : (riskLevel === 'SUSPICIOUS' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(2, 132, 199, 0.4)');
 
     ctx.save();
     ctx.strokeStyle = glowColor;
@@ -158,7 +160,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
 
     ctx.lineTo(x + w, centerY);
     ctx.lineTo(x, centerY);
-    ctx.fillStyle = riskLevel === 'CRITICAL' ? 'rgba(244, 63, 94, 0.08)' : 'rgba(6, 182, 212, 0.08)';
+    ctx.fillStyle = riskLevel === 'CRITICAL' ? 'rgba(244, 63, 94, 0.08)' : 'rgba(2, 132, 199, 0.08)';
     ctx.fill();
     ctx.restore();
   };
@@ -168,7 +170,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
     if (history.length === 0) {
       ctx.fillStyle = 'rgba(15, 23, 42, 0.5)';
       ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = '#64748b';
+      ctx.fillStyle = '#94a3b8';
       ctx.font = '11px JetBrains Mono, monospace';
       ctx.fillText('Awaiting 16 kHz Audio Stream for Spectral Analysis...', x + 20, y + h / 2);
       return;
@@ -213,7 +215,7 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
     }
 
     ctx.save();
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
     ctx.font = '9px JetBrains Mono, monospace';
     const freqs = ['8 kHz', '6 kHz', '4 kHz', '2 kHz', '0 Hz'];
     for (let i = 0; i < freqs.length; i++) {
@@ -229,64 +231,64 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-4 lg:p-5 flex flex-col gap-3 relative overflow-hidden border border-slate-800">
+    <div className="bg-white rounded-2xl p-4 lg:p-5 flex flex-col gap-3.5 border border-slate-200 shadow-sm">
       
       {/* Top Controls & Status Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 z-10">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
             <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-white tracking-wide uppercase font-mono flex items-center gap-2">
+            <h2 className="text-sm font-bold text-slate-900 tracking-wide font-display flex items-center gap-2">
               Real-Time Signal Canvas
-              <span className="text-[10px] text-cyan-400 font-normal px-2 py-0.5 bg-cyan-950/60 border border-cyan-800/60 rounded">
+              <span className="text-[10px] text-blue-700 font-semibold px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-md font-mono">
                 16 kHz PCM / 60 FPS
               </span>
             </h2>
-            <p className="text-[11px] text-slate-400 font-sans">
-              Live Spectral Mel-Decomposition & High-Frequency Neural Vocoder Boundary Tracker
+            <p className="text-xs text-slate-500 font-medium">
+              Live Spectral Mel-Decomposition & High-Frequency Vocoder Boundary Analysis
             </p>
           </div>
         </div>
 
         {/* Live VAD & Level Indicators */}
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border transition-all ${
+        <div className="flex items-center gap-2.5">
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono border transition-all ${
             vadActive
-              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 glow-emerald'
-              : 'bg-slate-900 border-slate-800 text-slate-500'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold'
+              : 'bg-slate-50 border-slate-200 text-slate-500'
           }`}>
-            <Radio className={`w-3.5 h-3.5 ${vadActive ? 'animate-pulse text-emerald-400' : 'text-slate-600'}`} />
+            <Radio className={`w-3.5 h-3.5 ${vadActive ? 'animate-pulse text-emerald-600' : 'text-slate-400'}`} />
             <span>VAD: {vadActive ? 'VOICE ACTIVE' : 'SILENT GAP'}</span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
-            <span className="text-slate-500 text-[10px]">RMS</span>
-            <span>{isStreaming ? `${volumeDb} dB` : '-∞ dB'}</span>
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700">
+            <span className="text-slate-400 text-[10px]">RMS</span>
+            <span className="font-semibold">{isStreaming ? `${volumeDb} dB` : '-∞ dB'}</span>
           </div>
 
-          <div className="flex items-center bg-slate-900/90 p-1 rounded-lg border border-slate-800 text-xs">
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-semibold">
             <button
               onClick={() => setViewMode('dual')}
-              className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                viewMode === 'dual' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                viewMode === 'dual' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Dual
             </button>
             <button
               onClick={() => setViewMode('spectrogram')}
-              className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                viewMode === 'spectrogram' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                viewMode === 'spectrogram' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Spectrogram
             </button>
             <button
               onClick={() => setViewMode('waveform')}
-              className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                viewMode === 'waveform' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-md transition-all ${
+                viewMode === 'waveform' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Waveform
@@ -295,30 +297,30 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
         </div>
       </div>
 
-      {/* Main Canvas Display */}
-      <div className="relative w-full h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-800/80 bg-[#080d1a] shadow-inner">
+      {/* Main Canvas Display with Dark Display Interior for Spectral Contrast */}
+      <div className="relative w-full h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-900 bg-[#0a0f1d] shadow-inner">
         <canvas
           ref={canvasRef}
           className="w-full h-full block cursor-crosshair"
         />
 
-        {/* Real-Time Telemetry Bar at bottom of canvas */}
-        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between pointer-events-none text-[11px] font-mono text-slate-400 bg-slate-950/75 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800/80">
+        {/* Telemetry Bar at bottom of canvas */}
+        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between pointer-events-none text-[11px] font-mono text-slate-300 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-cyan-400">
+            <span className="flex items-center gap-1 text-cyan-400 font-semibold">
               <Zap className="w-3 h-3" /> Ring Buffer: 4.0s (50% Overlap)
             </span>
-            <span className="hidden md:inline text-slate-500">|</span>
-            <span className="hidden md:inline">FFT: 1024-pt Hann Window</span>
+            <span className="hidden md:inline text-slate-600">|</span>
+            <span className="hidden md:inline text-slate-400">FFT: 1024-pt Hann Window</span>
           </div>
 
           <div className="flex items-center gap-2">
             {vocoderCutoffKhz < 10 ? (
-              <span className="flex items-center gap-1 text-rose-400 font-semibold animate-pulse">
-                <AlertTriangle className="w-3.5 h-3.5" /> High-Freq Cutoff Detected ({vocoderCutoffKhz.toFixed(1)} kHz)
+              <span className="flex items-center gap-1 text-rose-400 font-bold animate-pulse">
+                <AlertTriangle className="w-3.5 h-3.5" /> High-Freq Cutoff ({vocoderCutoffKhz.toFixed(1)} kHz)
               </span>
             ) : (
-              <span className="text-emerald-400 flex items-center gap-1">
+              <span className="text-emerald-400 flex items-center gap-1 font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Natural Harmonic Spectrum (16 kHz Full-Band)
               </span>
             )}
@@ -327,9 +329,9 @@ export const AudioCanvas: React.FC<AudioCanvasProps> = ({
       </div>
 
       {/* Ephemeral Memory Explainer */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-sans">
-        <span>⚡ <strong>Section 6 DPDP Compliance</strong>: Sliding audio memory frames are overwritten every 2000ms with zero persistent disk logging.</span>
-        <span className="font-mono text-cyan-400">Client Memory: ~4.2 MB RAM</span>
+      <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
+        <span>⚡ <strong>Section 6 DPDP Compliance</strong>: Sliding audio memory frames are overwritten every 2000ms with zero persistent disk writes.</span>
+        <span className="font-mono text-blue-600 font-semibold">Client Memory: ~4.2 MB RAM</span>
       </div>
 
     </div>

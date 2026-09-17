@@ -104,60 +104,60 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-rose-500/50 rounded-2xl shadow-2xl overflow-hidden glass-panel-danger glow-red">
+      <div className="relative w-full max-w-2xl bg-white border border-rose-200 rounded-3xl shadow-2xl overflow-hidden">
         
         {/* Header Ribbon */}
-        <div className="bg-gradient-to-r from-rose-900/90 via-rose-800 to-red-950 px-6 py-4 flex items-center justify-between border-b border-rose-500/40">
+        <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-700 px-6 py-4 flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-400 flex items-center justify-center text-rose-200 animate-pulse">
-              <ShieldAlert className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white">
+              <ShieldAlert className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-white font-display tracking-wide uppercase flex items-center gap-2">
+              <h3 className="text-base font-extrabold font-display tracking-wide uppercase flex items-center gap-2">
                 Automated Fraud Mitigation Active
-                <span className="text-xs bg-rose-950 border border-rose-400/50 text-rose-200 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-white text-rose-800 px-2 py-0.5 rounded-full font-bold">
                   Risk: {metrics.compositeRiskScore.toFixed(1)}%
                 </span>
               </h3>
-              <p className="text-xs text-rose-200/90">
-                Synthetic Voice Impersonation Detected — Financial Wire Transfer Suspended
+              <p className="text-xs text-rose-100">
+                Synthetic Voice Impersonation Detected — Wire Transfer Suspended
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-300 transition-colors"
+            className="p-1.5 rounded-lg bg-black/20 hover:bg-black/30 text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-5 text-slate-200 max-h-[80vh] overflow-y-auto">
+        <div className="p-6 space-y-5 text-slate-800 max-h-[80vh] overflow-y-auto">
           
           {/* Intercept Alert Card */}
-          <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
-              <strong className="text-rose-200 text-sm block">VaniRakshak Zero-Trust Threat Enforcement</strong>
-              <p className="text-slate-300 leading-relaxed">
+              <strong className="text-rose-800 text-sm block">VaniRakshak Zero-Trust Threat Enforcement</strong>
+              <p className="text-rose-950/80 leading-relaxed">
                 Vocal tract acoustics during the verbal transfer authorization failed biological neural signature verification. High probability of real-time AI voice conversion (ElevenLabs / DiffWave clone).
               </p>
             </div>
           </div>
 
           {/* Intercepted Transaction Details Card */}
-          <div className="bg-slate-950/60 rounded-xl p-4 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-slate-600 font-bold flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-blue-600" />
                 Interception Target Transaction
               </span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold">
                 SUSPENDED IN MEMORY
               </span>
             </div>
@@ -165,37 +165,37 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
               <div>
                 <span className="text-slate-500 block text-[11px]">Requested Amount</span>
-                <span className="font-bold text-rose-400 text-sm font-mono">
+                <span className="font-extrabold text-rose-600 text-sm font-mono">
                   ₹{transfer.amount.toLocaleString('en-IN')}
                 </span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Claimed Speaker</span>
-                <span className="font-semibold text-white truncate block">{transfer.requestedByCaller}</span>
+                <span className="font-bold text-slate-900 truncate block">{transfer.requestedByCaller}</span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Beneficiary Target</span>
-                <span className="font-semibold text-white truncate block">{transfer.recipientName}</span>
+                <span className="font-bold text-slate-900 truncate block">{transfer.recipientName}</span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Caller Gateway</span>
-                <span className="font-mono text-amber-300">{transfer.callerLocation}</span>
+                <span className="font-mono text-amber-700 font-semibold">{transfer.callerLocation}</span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Target Account</span>
-                <span className="font-mono text-slate-300">{transfer.accountNumber}</span>
+                <span className="font-mono text-slate-700 font-medium">{transfer.accountNumber}</span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">DPDP Status</span>
-                <span className="text-emerald-400 font-medium">Sec 6 Compliant</span>
+                <span className="text-emerald-700 font-bold">Sec 6 Compliant</span>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-800/80">
-              <span className="text-[11px] font-mono text-slate-400 block mb-1.5">Triggered Anomaly Vectors:</span>
+            <div className="pt-2 border-t border-slate-200">
+              <span className="text-[11px] font-mono text-slate-500 font-semibold block mb-1.5">Triggered Anomaly Vectors:</span>
               <div className="flex flex-wrap gap-1.5">
                 {transfer.securityFlags.map((flag, idx) => (
-                  <span key={idx} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 border border-rose-500/40 text-rose-300 font-mono">
+                  <span key={idx} className="text-[10px] px-2.5 py-0.5 rounded-full bg-white border border-rose-200 text-rose-700 font-mono font-medium">
                     • {flag}
                   </span>
                 ))}
@@ -204,21 +204,21 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
           </div>
 
           {/* Out-of-band Step-up OTP Verification Module */}
-          <div className="bg-slate-950/80 rounded-xl p-4 border border-cyan-500/30 space-y-3">
+          <div className="bg-blue-50/70 rounded-2xl p-4 border border-blue-200 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-cyan-400" />
-                <span className="text-xs font-bold text-white uppercase font-mono">
+                <KeyRound className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-bold text-blue-950 uppercase font-mono">
                   Step-Up Out-of-Band Verification Challenge
                 </span>
               </div>
-              <span className="text-[10px] text-cyan-300 bg-cyan-950/80 border border-cyan-800 px-2 py-0.5 rounded font-mono">
+              <span className="text-[10px] text-blue-800 bg-blue-100 border border-blue-300 px-2 py-0.5 rounded font-mono font-bold">
                 SMS Token Dispatched
               </span>
             </div>
 
-            <p className="text-xs text-slate-300">
-              To prevent deepfake extortion, an urgent 4-digit verification code has been dispatched to the account owner's registered primary device.
+            <p className="text-xs text-slate-600">
+              To prevent deepfake extortion, a 4-digit verification code has been dispatched to the account owner's registered phone.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -230,14 +230,14 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
                   value={otpInput}
                   onChange={(e) => setOtpInput(e.target.value)}
                   disabled={otpState === 'AUTHORIZED'}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-xs"
                 />
               </div>
 
               <button
                 onClick={handleVerifyOtp}
                 disabled={!otpInput || otpState === 'AUTHORIZED'}
-                className="w-full sm:w-auto px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <Fingerprint className="w-4 h-4" />
                 <span>{otpState === 'VERIFYING' ? 'Verifying...' : (otpState === 'AUTHORIZED' ? 'Authorized' : 'Submit Challenge')}</span>
@@ -245,15 +245,15 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
             </div>
 
             {otpState === 'AUTHORIZED' && (
-              <div className="p-2.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>Out-of-band biometric authentication successful. Legitimate caller override active.</span>
               </div>
             )}
 
             {otpState === 'REJECTED' && (
-              <div className="p-2.5 rounded-lg bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
                 <span>Incorrect OTP. Unauthorized synthetic actor confirmed. Transfer remains quarantined.</span>
               </div>
             )}
@@ -263,7 +263,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <button
               onClick={handleKillswitch}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all glow-red"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all"
             >
               <PhoneOff className="w-4 h-4" />
               <span>Trigger Audio Killswitch & Freeze Account</span>
@@ -271,9 +271,9 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
 
             <button
               onClick={handleExportForensicReport}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+              className="w-full sm:w-auto px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
             >
-              <Download className="w-4 h-4 text-cyan-400" />
+              <Download className="w-4 h-4 text-blue-600" />
               <span>{reportExported ? 'Report Downloaded (JSON)' : 'Export Forensic Audit (JSON)'}</span>
             </button>
           </div>
