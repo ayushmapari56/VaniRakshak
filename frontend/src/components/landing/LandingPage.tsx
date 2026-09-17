@@ -13,7 +13,7 @@ import {
   TrendingUp,
   HeartHandshake
 } from 'lucide-react';
-import { MountainParallax } from './MountainParallax';
+import { HeroSection } from './HeroSection';
 import { REGIONAL_ACCENTS } from '../../data/presets';
 import { smoothScroll } from '../../services/smoothScroll';
 
@@ -45,7 +45,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 <span className="text-xl font-extrabold font-heading tracking-tight text-slate-900">
                   VaniRakshak
                 </span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 border border-blue-200 font-body">
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-orange-50 text-orange-700 border border-orange-200 font-body">
                   वाणी रक्षक
                 </span>
               </div>
@@ -55,16 +55,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 font-body">
-            <button onClick={() => scrollToSection('features')} className="hover:text-blue-600 transition-colors cursor-pointer">
+            <button onClick={() => scrollToSection('features')} className="hover:text-orange-600 transition-colors cursor-pointer">
               Features
             </button>
-            <button onClick={() => scrollToSection('pipeline')} className="hover:text-blue-600 transition-colors cursor-pointer">
+            <button onClick={() => scrollToSection('pipeline')} className="hover:text-orange-600 transition-colors cursor-pointer">
               Architecture
             </button>
-            <button onClick={() => scrollToSection('accents')} className="hover:text-blue-600 transition-colors cursor-pointer">
+            <button onClick={() => scrollToSection('accents')} className="hover:text-orange-600 transition-colors cursor-pointer">
               Indian Languages
             </button>
-            <button onClick={() => scrollToSection('compliance')} className="hover:text-blue-600 transition-colors cursor-pointer">
+            <button onClick={() => scrollToSection('compliance')} className="hover:text-orange-600 transition-colors cursor-pointer">
               DPDP Compliance
             </button>
           </nav>
@@ -80,9 +80,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
             <button
               onClick={onStart}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 flex items-center gap-2 transition-all transform active:scale-95 font-body cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 flex items-center gap-2 transition-all transform active:scale-95 font-body cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-blue-200" />
+              <Sparkles className="w-4 h-4 text-amber-200" />
               <span>Let's Start</span>
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -91,8 +91,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </header>
 
-      {/* 2. Mountain Parallax Hero Experience */}
-      <MountainParallax 
+      {/* 2. Hero Section with User's Image */}
+      <HeroSection 
         onStart={onStart}
         onExplore={() => scrollToSection('live-preview')}
       />
