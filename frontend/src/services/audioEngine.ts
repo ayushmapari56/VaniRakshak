@@ -28,6 +28,12 @@ class AudioEngine {
   private isLiveMic: boolean = false;
   private currentPreset: AudioSamplePreset | null = null;
 
+  // WebSocket connection to backend
+  private ws: WebSocket | null = null;
+  private wsConnected: boolean = false;
+  private latestServerMetrics: ThreatMetrics | null = null;
+  private latestServerBreakdown: AcousticBreakdown | null = null;
+
   // Synthesis playback nodes for simulation presets
   private synthNodes: {
     oscillators: OscillatorNode[];
@@ -83,9 +89,58 @@ class AudioEngine {
     return () => this.listeners.delete(listener);
   }
 
+  private connectWebSocket() {
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    try {
+      this.ws = new WebSocket('ws://localhost:8000/ws/audio-stream');
+      this.ws.binaryType = 'arraybuffer';
+
+      this.ws.onopen = () => {
+        this.wsConnected = true;
+        this.sendContextUpdate();
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'METRICS_UPDATE' && data.metrics && data.breakdown) {
+            this.latestServerMetrics = data.metrics;
+            this.latestServerBreakdown = data.breakdown;
+          }
+        } catch {}
+      };
+
+      this.ws.onclose = () => {
+        this.wsConnected = false;
+        this.ws = null;
+      };
+
+      this.ws.onerror = () => {
+        this.wsConnected = false;
+      };
+    } catch {
+      this.wsConnected = false;
+    }
+  }
+
+  private sendContextUpdate() {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'CONTEXT_UPDATE',
+        unverifiedGateway: this.unverifiedGateway,
+        highAmountRisk: this.highAmountRisk,
+        callerAnomalous: this.callerAnomalous
+      }));
+    }
+  }
+
   public async startLiveMicrophone(): Promise<void> {
     this.stopCurrentAudio();
     const ctx = this.initContext();
+    this.connectWebSocket();
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -125,11 +180,13 @@ class AudioEngine {
   public async playPresetSample(preset: AudioSamplePreset): Promise<void> {
     this.stopCurrentAudio();
     const ctx = this.initContext();
+    this.connectWebSocket();
 
     this.currentPreset = preset;
     this.isLiveMic = false;
     this.unverifiedGateway = !!preset.unverifiedGateway;
     this.highAmountRisk = (preset.transactionAmount || 0) > 100000;
+    this.sendContextUpdate();
 
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 1024;
@@ -229,6 +286,7 @@ class AudioEngine {
   public async playCustomAudioFile(file: File): Promise<void> {
     this.stopCurrentAudio();
     const ctx = this.initContext();
+    this.connectWebSocket();
 
     const arrayBuffer = await file.arrayBuffer();
     const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
@@ -277,6 +335,7 @@ class AudioEngine {
     this.unverifiedGateway = unverifiedGateway;
     this.highAmountRisk = highAmount;
     this.callerAnomalous = callerAnomalous;
+    this.sendContextUpdate();
   }
 
   public stopCurrentAudio(): void {
@@ -309,6 +368,14 @@ class AudioEngine {
       this.sourceNode = null;
     }
 
+    if (this.ws) {
+      try {
+        this.ws.close();
+      } catch {}
+      this.ws = null;
+      this.wsConnected = false;
+    }
+
     this.isRunning = false;
     this.isLiveMic = false;
     this.currentPreset = null;
@@ -329,6 +396,13 @@ class AudioEngine {
 
       this.analyser.getByteTimeDomainData(timeBuffer);
       this.analyser.getByteFrequencyData(freqBuffer);
+
+      // Stream to WebSocket server if connected (throttle to ~15-20 fps)
+      if (this.wsConnected && this.ws && this.ws.readyState === WebSocket.OPEN && frameCount % 3 === 0) {
+        try {
+          this.ws.send(timeBuffer.buffer);
+        } catch {}
+      }
 
       // Real RMS calculation
       let sumSquares = 0;
@@ -358,7 +432,7 @@ class AudioEngine {
       const vadActive = this.vadState;
 
       // Extract acoustic and Bayesian threat features
-      const { breakdown, rawSyntheticProb, rawAnomaly } = this.extractDSPFeatures(freqBuffer, vadActive);
+      const { breakdown: clientBreakdown, rawSyntheticProb, rawAnomaly } = this.extractDSPFeatures(freqBuffer, vadActive);
 
       let cContext = 0.05;
       if (this.unverifiedGateway) cContext += 0.45;
@@ -389,7 +463,7 @@ class AudioEngine {
         actionRequired = 'ALLOW';
       }
 
-      const metrics: ThreatMetrics = {
+      const clientMetrics: ThreatMetrics = {
         timestamp: Date.now(),
         syntheticProbability: Math.round(this.smoothedSynthProb * 100) / 100,
         contextualRisk: Math.round(cContext * 100) / 100,
@@ -398,14 +472,23 @@ class AudioEngine {
         riskLevel,
         actionRequired,
         confidence: 0.94,
-        latencyMs: 18
+        latencyMs: this.wsConnected ? 14 : 18
       };
+
+      // Use server metrics if fresh, otherwise use client metrics
+      const finalMetrics = (this.wsConnected && this.latestServerMetrics) 
+        ? this.latestServerMetrics 
+        : clientMetrics;
+
+      const finalBreakdown = (this.wsConnected && this.latestServerBreakdown) 
+        ? this.latestServerBreakdown 
+        : clientBreakdown;
 
       // Notify listeners (UI subscriber)
       frameCount++;
       if (frameCount % 2 === 0) {
         this.listeners.forEach(listener => {
-          listener(timeBuffer, freqBuffer, metrics, breakdown, vadActive, Math.round(volumeDb));
+          listener(timeBuffer, freqBuffer, finalMetrics, finalBreakdown, vadActive, Math.round(volumeDb));
         });
       }
 

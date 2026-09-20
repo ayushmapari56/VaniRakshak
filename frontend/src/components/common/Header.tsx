@@ -1,6 +1,7 @@
-import React from 'react';
-import { Cpu, Lock, Volume2, Mic, Sparkles, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Cpu, Lock, Volume2, Mic, Sparkles, ArrowLeft, Server } from 'lucide-react';
 import type { RiskLevel } from '../../types';
+import { apiService } from '../../services/api';
 
 interface HeaderProps {
   riskLevel: RiskLevel;
@@ -19,6 +20,15 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenReport,
   onBackToLanding
 }) => {
+  const [backendOnline, setBackendOnline] = useState<boolean>(apiService.isOnline());
+
+  useEffect(() => {
+    const unsubscribe = apiService.onStatusChange((online) => {
+      setBackendOnline(online);
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-40 px-4 lg:px-8 py-3 transition-all shadow-xs">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
@@ -69,6 +79,17 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Live Audio Status & Telemetry Badges */}
         <div className="flex items-center gap-2.5">
           
+          {/* Real-Time FastAPI Backend Connectivity Status */}
+          <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-mono font-medium ${
+            backendOnline 
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+              : 'bg-amber-50 border-amber-200 text-amber-700'
+          }`} title={backendOnline ? 'FastAPI Python Server Connected (Port 8000)' : 'Client WebAudio DSP Fallback Mode'}>
+            <span className={`w-2 h-2 rounded-full ${backendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <Server className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">{backendOnline ? 'Backend: FastAPI Online' : 'Backend: Fallback'}</span>
+          </div>
+
           {/* Active Audio State Pill */}
           <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
             isStreaming
@@ -80,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
             {isLiveMic ? (
               <>
                 <Mic className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
-                <span className="font-semibold text-blue-900">Live Microphone (16 kHz)</span>
+                <span className="font-semibold text-blue-900">Live Mic (16 kHz)</span>
               </>
             ) : isStreaming ? (
               <>
@@ -99,12 +120,6 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium">
             <Lock className="w-3.5 h-3.5 text-emerald-600" />
             <span>DPDP 2023 Sec 6</span>
-          </div>
-
-          {/* Zero Cloud Compute Cost Badge */}
-          <div className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono">
-            <span className="font-bold text-slate-900">₹0.00</span>
-            <span className="text-slate-500 text-[10px]">/call</span>
           </div>
 
           {/* Forensic Audit Report Modal Trigger */}
