@@ -368,6 +368,7 @@ export function App() {
           isStreaming={isStreaming}
           isLiveMic={isLiveMic}
           activePresetId={activePreset?.id}
+          metrics={metrics}
           onStartLiveMic={handleStartLiveMic}
           onPlayPreset={handlePlayPreset}
           onStopAudio={handleStopAudio}
