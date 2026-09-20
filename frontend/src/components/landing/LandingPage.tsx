@@ -16,6 +16,7 @@ import {
 import { HeroSection } from './HeroSection';
 import { REGIONAL_ACCENTS } from '../../data/presets';
 import { smoothScroll } from '../../services/smoothScroll';
+import { RiskFormulaCard } from '../common/RiskFormulaCard';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -322,6 +323,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </p>
             </div>
 
+          </div>
+
+          {/* Mathematical Threat Fusion Engine Diagram */}
+          <div className="mt-16 pt-12 border-t border-slate-200">
+            <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
+              <span className="text-xs font-mono font-bold text-blue-700 uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                Mathematical Fusion Engine
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 font-heading">
+                Dynamic Bayesian Threat Scoring Formula
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-body">
+                Explainable, linear-time threat fusion combining neural spectral inference, contextual threat metadata, and acoustic anomalies.
+              </p>
+            </div>
+            <RiskFormulaCard showLiveBreakdown={false} />
           </div>
 
         </div>
