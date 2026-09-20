@@ -14,15 +14,13 @@ import {
   Info,
   Layers
 } from 'lucide-react';
-import type { AudioSamplePreset, RegionalAccent, ThreatMetrics } from '../../types';
+import type { AudioSamplePreset, RegionalAccent } from '../../types';
 import { AUDIO_SAMPLE_PRESETS, REGIONAL_ACCENTS } from '../../data/presets';
-import { RiskFormulaCard } from '../common/RiskFormulaCard';
 
 interface JudgeConsoleProps {
   isStreaming: boolean;
   isLiveMic?: boolean;
   activePresetId?: string;
-  metrics?: ThreatMetrics;
   onStartLiveMic: () => void;
   onPlayPreset: (preset: AudioSamplePreset) => void;
   onStopAudio: () => void;
@@ -33,14 +31,13 @@ interface JudgeConsoleProps {
 export const JudgeConsole: React.FC<JudgeConsoleProps> = ({
   isStreaming,
   activePresetId,
-  metrics,
   onStartLiveMic,
   onPlayPreset,
   onStopAudio,
   onUploadFile,
   onContextChange
 }) => {
-  const [activeTab, setActiveTab] = useState<'presets' | 'accents' | 'context' | 'formula' | 'architecture'>('presets');
+  const [activeTab, setActiveTab] = useState<'presets' | 'accents' | 'context' | 'architecture'>('presets');
   const [selectedAccent, setSelectedAccent] = useState<RegionalAccent>(REGIONAL_ACCENTS[0]);
   
   // Context state
@@ -154,18 +151,6 @@ export const JudgeConsole: React.FC<JudgeConsoleProps> = ({
         >
           <Globe className="w-3.5 h-3.5" />
           <span>Pan-Indian Languages ({REGIONAL_ACCENTS.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('formula')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer ${
-            activeTab === 'formula'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
-        >
-          <Award className="w-3.5 h-3.5" />
-          <span>Threat Formula S_risk(t)</span>
         </button>
 
         <button
@@ -300,25 +285,14 @@ export const JudgeConsole: React.FC<JudgeConsoleProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Dedicated Mathematical Threat Formula Architecture */}
-      {activeTab === 'formula' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200 flex items-start gap-3">
-            <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-700 leading-relaxed font-body">
-              <strong className="text-slate-900 font-heading">Bayesian Threat Fusion Principle</strong>: VaniRakshak avoids black-box ambiguity by computing an explainable linear-time composite score. Real-time acoustic inference (<strong className="text-blue-700">P_synth</strong>: 60%), contextual transaction threat metadata (<strong className="text-emerald-700">C_context</strong>: 25%), and speaker baseline variance (<strong className="text-amber-700">A_anomaly</strong>: 15%) are continuously evaluated with sub-25ms latency.
-            </div>
-          </div>
-
-          <RiskFormulaCard metrics={metrics} showLiveBreakdown={true} />
-        </div>
-      )}
-
-      {/* Tab 4: Context Risk Modifiers */}
+      {/* Tab 3: Context Risk Modifiers */}
       {activeTab === 'context' && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 font-body">
-            Toggle live contextual parameters below to dynamically adjust external metadata factors (<span className="font-mono font-bold text-emerald-700">C_context</span>) and baseline variance (<span className="font-mono font-bold text-amber-700">A_anomaly</span>) in real-time:
+            Configure live contextual parameters (<span className="font-mono font-bold text-blue-700">C_context</span>) incorporated into the Bayesian risk formula:
+            <code className="text-blue-700 font-bold block mt-1 font-mono text-[11px]">
+              S_risk(t) = 0.60 · P_synth(t) + 0.25 · C_context + 0.15 · A_anomaly
+            </code>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
