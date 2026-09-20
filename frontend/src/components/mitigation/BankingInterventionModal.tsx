@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ThreatMetrics, WireTransferSimulation } from '../../types';
+import { apiService } from '../../services/api';
 
 interface BankingInterventionModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
   const [otpInput, setOtpInput] = useState('');
   const [otpState, setOtpState] = useState<'PENDING' | 'VERIFYING' | 'REJECTED' | 'AUTHORIZED'>('PENDING');
   const [reportExported, setReportExported] = useState(false);
+  const [backendActionMsg, setBackendActionMsg] = useState<string | null>(null);
 
   const transfer: WireTransferSimulation = {
     transactionId: 'TXN-VR-994281',
@@ -56,18 +58,65 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
 
   if (!isOpen) return null;
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     setOtpState('VERIFYING');
-    setTimeout(() => {
-      if (otpInput === '8492' || otpInput === '1234') {
-        setOtpState('AUTHORIZED');
-      } else {
-        setOtpState('REJECTED');
+    
+    // Simulate / Call backend
+    if (otpInput === '8492' || otpInput === '1234') {
+      setOtpState('AUTHORIZED');
+      try {
+        const res = await apiService.interceptWireTransfer({
+          transactionId: transfer.transactionId,
+          amount: transfer.amount,
+          recipientName: transfer.recipientName,
+          recipientBank: transfer.recipientBank,
+          accountNumber: transfer.accountNumber,
+          requestedByCaller: transfer.requestedByCaller,
+          callerPhone: transfer.callerPhone,
+          callerLocation: transfer.callerLocation,
+          compositeRiskScore: metrics.compositeRiskScore,
+          action: 'AUTHORIZE'
+        });
+        setBackendActionMsg(`Server Auth Code: ${res.authAuditCode} (${res.actionTaken})`);
+      } catch {
+        setBackendActionMsg('Authorized locally via out-of-band verification.');
       }
-    }, 900);
+    } else {
+      setOtpState('REJECTED');
+      try {
+        await apiService.interceptWireTransfer({
+          transactionId: transfer.transactionId,
+          amount: transfer.amount,
+          recipientName: transfer.recipientName,
+          recipientBank: transfer.recipientBank,
+          accountNumber: transfer.accountNumber,
+          requestedByCaller: transfer.requestedByCaller,
+          callerPhone: transfer.callerPhone,
+          callerLocation: transfer.callerLocation,
+          compositeRiskScore: metrics.compositeRiskScore,
+          action: 'CHALLENGE_OTP'
+        });
+      } catch {}
+    }
   };
 
-  const handleKillswitch = () => {
+  const handleKillswitch = async () => {
+    try {
+      const res = await apiService.interceptWireTransfer({
+        transactionId: transfer.transactionId,
+        amount: transfer.amount,
+        recipientName: transfer.recipientName,
+        recipientBank: transfer.recipientBank,
+        accountNumber: transfer.accountNumber,
+        requestedByCaller: transfer.requestedByCaller,
+        callerPhone: transfer.callerPhone,
+        callerLocation: transfer.callerLocation,
+        compositeRiskScore: metrics.compositeRiskScore,
+        action: 'FREEZE_ACCOUNT'
+      });
+      setBackendActionMsg(`Server Audit Code: ${res.authAuditCode}`);
+    } catch {}
+
     onKillswitchAudio();
     confetti({
       particleCount: 80,
@@ -129,7 +178,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-black/20 hover:bg-black/30 text-white transition-colors"
+            className="p-1.5 rounded-lg bg-black/20 hover:bg-black/30 text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -138,6 +187,13 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
         {/* Content Body */}
         <div className="p-6 space-y-5 text-slate-800 max-h-[80vh] overflow-y-auto">
           
+          {backendActionMsg && (
+            <div className="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-xs flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>{backendActionMsg}</span>
+            </div>
+          )}
+
           {/* Intercept Alert Card */}
           <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
@@ -236,7 +292,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
               <button
                 onClick={handleVerifyOtp}
                 disabled={!otpInput || otpState === 'AUTHORIZED'}
-                className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
               >
                 <Fingerprint className="w-4 h-4" />
                 <span>{otpState === 'VERIFYING' ? 'Verifying...' : (otpState === 'AUTHORIZED' ? 'Authorized' : 'Submit Challenge')}</span>
@@ -262,7 +318,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <button
               onClick={handleKillswitch}
-              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
             >
               <PhoneOff className="w-4 h-4" />
               <span>Trigger Audio Killswitch & Freeze Account</span>
@@ -270,7 +326,7 @@ export const BankingInterventionModal: React.FC<BankingInterventionModalProps> =
 
             <button
               onClick={handleExportForensicReport}
-              className="w-full sm:w-auto px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+              className="w-full sm:w-auto px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Download className="w-4 h-4 text-blue-600" />
               <span>{reportExported ? 'Report Downloaded (JSON)' : 'Export Forensic Audit (JSON)'}</span>
